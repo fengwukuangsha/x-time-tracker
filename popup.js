@@ -162,6 +162,74 @@ function awardResetPoints() {
   });
 }
 
+// --- History ---
+
+const historyToggle = document.getElementById("historyToggle");
+const historyPanel = document.getElementById("historyPanel");
+const historyList = document.getElementById("historyList");
+const historyArrow = document.getElementById("historyArrow");
+
+historyToggle.addEventListener("click", () => {
+  const open = historyPanel.style.display !== "none";
+  historyPanel.style.display = open ? "none" : "block";
+  historyArrow.innerHTML = open ? "&#9662;" : "&#9652;";
+  if (!open) loadHistory();
+});
+
+function formatDuration(seconds) {
+  if (seconds < 60) return seconds + "秒";
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  if (m < 60) return m + "分" + (s > 0 ? s + "秒" : "");
+  const h = Math.floor(m / 60);
+  const rm = m % 60;
+  return h + "时" + rm + "分";
+}
+
+function loadHistory() {
+  chrome.storage.local.get(["sessionHistory"], (result) => {
+    const history = result.sessionHistory || [];
+    if (history.length === 0) {
+      historyList.innerHTML = '<div class="history-empty">暂无访问记录</div>';
+      return;
+    }
+
+    // 按日期分组，最新日期在前
+    const grouped = {};
+    const dateOrder = [];
+    for (let i = history.length - 1; i >= 0; i--) {
+      const s = history[i];
+      const date = new Date(s.start).toLocaleDateString("zh-CN", {
+        month: "numeric", day: "numeric", weekday: "short"
+      });
+      if (!grouped[date]) {
+        grouped[date] = [];
+        dateOrder.push(date);
+      }
+      grouped[date].push(s);
+    }
+
+    let html = "";
+    for (const date of dateOrder) {
+      const sessions = grouped[date];
+      const dayTotal = sessions.reduce((sum, s) => sum + s.duration, 0);
+      html += `<div class="history-date"><span>${date}</span><span class="history-day-total">${formatDuration(dayTotal)}</span></div>`;
+      // 按时间正序显示
+      for (const s of sessions.slice().reverse()) {
+        const st = new Date(s.start);
+        const ed = new Date(s.end);
+        const stStr = String(st.getHours()).padStart(2, "0") + ":" + String(st.getMinutes()).padStart(2, "0");
+        const edStr = String(ed.getHours()).padStart(2, "0") + ":" + String(ed.getMinutes()).padStart(2, "0");
+        html += `<div class="history-item">
+          <span class="history-time">${stStr} - ${edStr}</span>
+          <span class="history-dur">${formatDuration(s.duration)}</span>
+        </div>`;
+      }
+    }
+    historyList.innerHTML = html;
+  });
+}
+
 // --- Timer & Settings ---
 
 chrome.storage.local.get(["limitMinutes"], (result) => {

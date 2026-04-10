@@ -75,13 +75,25 @@ function stopTimer() {
   if (activeTabId && startTime) {
     // 累计今日时间
     const elapsed = Date.now() - startTime;
-    chrome.storage.local.get(["totalMinutesToday", "todayDate"], (result) => {
+    const startTs = startTime;
+    const endTs = Date.now();
+    chrome.storage.local.get(["totalMinutesToday", "todayDate", "sessionHistory"], (result) => {
       const today = new Date().toDateString();
       if (result.todayDate !== today) {
         chrome.storage.local.set({ totalMinutesToday: 0, todayDate: today });
       }
       const total = (result.totalMinutesToday || 0) + elapsed / 60000;
-      chrome.storage.local.set({ totalMinutesToday: total });
+
+      // 保存访问记录
+      const history = result.sessionHistory || [];
+      history.push({
+        start: startTs,
+        end: endTs,
+        duration: Math.round(elapsed / 1000)
+      });
+      if (history.length > 200) history.splice(0, history.length - 200);
+
+      chrome.storage.local.set({ totalMinutesToday: total, sessionHistory: history });
     });
   }
   activeTabId = null;

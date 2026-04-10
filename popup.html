@@ -227,6 +227,60 @@
     }
     .btn-reset:hover { border-color: #ef4444; color: #ef4444; }
 
+    /* History Section */
+    .history-section {
+      margin-top: 8px;
+    }
+    .history-toggle {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #141414;
+      border: 1px solid #262626;
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #a3a3a3;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .history-toggle:hover { border-color: #1d9bf0; color: #e5e5e5; }
+    .history-panel {
+      max-height: 220px;
+      overflow-y: auto;
+      margin-top: 8px;
+      background: #141414;
+      border: 1px solid #262626;
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    .history-panel::-webkit-scrollbar { width: 4px; }
+    .history-panel::-webkit-scrollbar-track { background: transparent; }
+    .history-panel::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+    .history-date {
+      font-size: 11px;
+      color: #737373;
+      padding: 6px 0 4px;
+      border-bottom: 1px solid #1a1a1a;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+    }
+    .history-date:first-child { padding-top: 2px; }
+    .history-day-total { color: #404040; font-weight: 400; }
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      font-size: 12px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    .history-item:last-child { border-bottom: none; }
+    .history-time { color: #737373; }
+    .history-dur { color: #e5e5e5; font-weight: 600; }
+    .history-empty { color: #525252; font-size: 12px; text-align: center; padding: 20px 0; }
+
     .footer {
       text-align: center;
       margin-top: 16px;
@@ -288,6 +342,16 @@
     <div class="setting-row">
       <span class="setting-label">重置今日统计</span>
       <button id="resetBtn" class="btn-reset">重置</button>
+    </div>
+  </div>
+
+  <div class="history-section">
+    <button id="historyToggle" class="history-toggle">
+      <span>历史记录</span>
+      <span id="historyArrow">&#9662;</span>
+    </button>
+    <div id="historyPanel" class="history-panel" style="display:none;">
+      <div id="historyList"></div>
     </div>
   </div>
 
