@@ -4,6 +4,7 @@ const progressFill = document.getElementById("progressFill");
 const todayTotalEl = document.getElementById("todayTotal");
 const limitDisplayEl = document.getElementById("limitDisplay");
 const limitInput = document.getElementById("limitInput");
+const resetThresholdInput = document.getElementById("resetThresholdInput");
 const resetBtn = document.getElementById("resetBtn");
 
 // Honor elements
@@ -232,8 +233,9 @@ function loadHistory() {
 
 // --- Timer & Settings ---
 
-chrome.storage.local.get(["limitMinutes"], (result) => {
+chrome.storage.local.get(["limitMinutes", "resetThresholdMinutes"], (result) => {
   if (result.limitMinutes) limitInput.value = result.limitMinutes;
+  if (result.resetThresholdMinutes) resetThresholdInput.value = result.resetThresholdMinutes;
 });
 
 limitInput.addEventListener("change", () => {
@@ -241,6 +243,12 @@ limitInput.addEventListener("change", () => {
   limitInput.value = val;
   limitDisplayEl.textContent = val + "m";
   chrome.storage.local.set({ limitMinutes: val });
+});
+
+resetThresholdInput.addEventListener("change", () => {
+  const val = Math.max(1, Math.min(30, parseInt(resetThresholdInput.value) || 3));
+  resetThresholdInput.value = val;
+  chrome.storage.local.set({ resetThresholdMinutes: val });
 });
 
 resetBtn.addEventListener("click", () => {

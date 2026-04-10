@@ -3,17 +3,21 @@
 const LIMIT_MINUTES = 10;
 const CHECK_INTERVAL_SECONDS = 5;
 const ALARM_NAME = "x-time-check";
+const DEFAULT_RESET_THRESHOLD_MINUTES = 3;
 
 // 状态
 let activeTabId = null;
 let startTime = null;
 let isNotified = false;
+let accumulatedSeconds = 0; // 离开前已累计的秒数
+let lastStopTime = null;
 
 // 初始化
 chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.local.set({
     totalMinutesToday: 0,
-    todayDate: new Date().toDateString()
+    todayDate: new Date().toDateString(),
+    resetThresholdMinutes: DEFAULT_RESET_THRESHOLD_MINUTES
   });
   chrome.alarms.create(ALARM_NAME, { periodInMinutes: CHECK_INTERVAL_SECONDS / 60 });
 });
@@ -59,9 +63,20 @@ function handleTabChange(activeInfo) {
       if (activeTabId !== activeInfo.tabId) {
         stopTimer();
         activeTabId = activeInfo.tabId;
-        startTime = Date.now();
-        isNotified = false;
-        updateBadge("0:00", "#22c55e");
+
+        // 检查离开时间是否超过重置阈值
+        chrome.storage.local.get(["resetThresholdMinutes"], (result) => {
+          const thresholdMs = (result.resetThresholdMinutes || DEFAULT_RESET_THRESHOLD_MINUTES) * 60 * 1000;
+          if (lastStopTime && (Date.now() - lastStopTime) > thresholdMs) {
+            accumulatedSeconds = 0; // 超过阈值，重置累计
+          }
+          startTime = Date.now();
+          isNotified = false;
+          const totalSec = accumulatedSeconds;
+          const m = Math.floor(totalSec / 60);
+          const s = totalSec % 60;
+          updateBadge(`${m}:${String(s).padStart(2, "0")}`, "#22c55e");
+        });
       }
     } else {
       if (activeTabId) {
@@ -73,23 +88,27 @@ function handleTabChange(activeInfo) {
 
 function stopTimer() {
   if (activeTabId && startTime) {
+    const elapsed = (Date.now() - startTime) / 1000;
+    accumulatedSeconds += elapsed;
+    lastStopTime = Date.now();
+
     // 累计今日时间
-    const elapsed = Date.now() - startTime;
     const startTs = startTime;
     const endTs = Date.now();
+    const totalElapsed = endTs - startTs;
     chrome.storage.local.get(["totalMinutesToday", "todayDate", "sessionHistory"], (result) => {
       const today = new Date().toDateString();
       if (result.todayDate !== today) {
         chrome.storage.local.set({ totalMinutesToday: 0, todayDate: today });
       }
-      const total = (result.totalMinutesToday || 0) + elapsed / 60000;
+      const total = (result.totalMinutesToday || 0) + totalElapsed / 60000;
 
       // 保存访问记录
       const history = result.sessionHistory || [];
       history.push({
         start: startTs,
         end: endTs,
-        duration: Math.round(elapsed / 1000)
+        duration: Math.round(totalElapsed / 1000)
       });
       if (history.length > 200) history.splice(0, history.length - 200);
 
@@ -103,9 +122,10 @@ function stopTimer() {
 function checkAndNotify() {
   if (!startTime) return;
 
-  const elapsed = Date.now() - startTime;
-  const minutes = Math.floor(elapsed / 60000);
-  const seconds = Math.floor((elapsed % 60000) / 1000);
+  const currentElapsed = (Date.now() - startTime) / 1000;
+  const totalSeconds = accumulatedSeconds + currentElapsed;
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = Math.floor(totalSeconds % 60);
   const timeStr = `${minutes}:${String(seconds).padStart(2, "0")}`;
 
   // 更新 badge
@@ -115,7 +135,7 @@ function checkAndNotify() {
   updateBadge(timeStr, color);
 
   // 更新存储
-  chrome.storage.local.set({ currentSeconds: Math.floor(elapsed / 1000), isTracking: true });
+  chrome.storage.local.set({ currentSeconds: Math.floor(totalSeconds), isTracking: true });
 
   // 超时提醒
   if (minutes >= LIMIT_MINUTES && !isNotified) {
@@ -137,11 +157,8 @@ function checkAndNotify() {
       total = 0;
       chrome.storage.local.set({ todayDate: today });
     }
-    // 只累加到上次保存的值 + 当前session
-    chrome.storage.local.get(["savedElapsed"], (r) => {
-      const currentTotal = total + elapsed / 60000;
-      chrome.storage.local.set({ displayTotalMinutes: currentTotal });
-    });
+    const currentTotal = total + currentElapsed / 60;
+    chrome.storage.local.set({ displayTotalMinutes: currentTotal });
   });
 }
 
