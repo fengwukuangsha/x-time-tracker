@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>X Time Tracker - 登录</title>
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-header">
+      <div class="auth-logo">X</div>
+      <h1 class="auth-title">Time Tracker</h1>
+      <p class="auth-subtitle" id="authSubtitle">登录以同步你的数据</p>
+    </div>
+
+    <!-- Sign In Form -->
+    <form id="signInForm" class="auth-form">
+      <div class="form-group">
+        <label for="signInEmail">邮箱</label>
+        <input type="email" id="signInEmail" placeholder="your@email.com" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="signInPassword">密码</label>
+        <input type="password" id="signInPassword" placeholder="输入密码" required autocomplete="current-password">
+      </div>
+      <div class="form-error" id="signInError"></div>
+      <button type="submit" class="btn-primary" id="signInBtn">登录</button>
+      <div class="form-switch">
+        还没有账号？ <a href="#" id="showSignUp">注册</a>
+      </div>
+    </form>
+
+    <!-- Sign Up Form -->
+    <form id="signUpForm" class="auth-form hidden">
+      <div class="form-group">
+        <label for="signUpName">用户名</label>
+        <input type="text" id="signUpName" placeholder="你的昵称" required autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label for="signUpEmail">邮箱</label>
+        <input type="email" id="signUpEmail" placeholder="your@email.com" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="signUpPassword">密码</label>
+        <input type="password" id="signUpPassword" placeholder="至少8位密码" required minlength="8" autocomplete="new-password">
+      </div>
+      <div class="form-error" id="signUpError"></div>
+      <button type="submit" class="btn-primary" id="signUpBtn">注册</button>
+      <div class="form-switch">
+        已有账号？ <a href="#" id="showSignIn">登录</a>
+      </div>
+    </form>
+
+    <!-- Success Screen -->
+    <div id="successScreen" class="success-screen hidden">
+      <div class="success-icon">✓</div>
+      <div class="success-text">登录成功！</div>
+      <div class="success-hint">正在返回扩展...</div>
+    </div>
+  </div>
+
+  <script type="module" src="./auth.js"></script>
+</body>
+</html>

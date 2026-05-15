@@ -6,6 +6,8 @@ body {
   color: #e5e5e5;
   padding: 20px;
 }
+.hidden { display: none !important; }
+
 .header {
   display: flex;
   align-items: center;
@@ -26,7 +28,124 @@ body {
 .header h1 {
   font-size: 15px;
   font-weight: 600;
+  flex: 1;
 }
+
+/* === Auth Screen === */
+#authScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 30px;
+}
+.auth-welcome {
+  text-align: center;
+  margin: 24px 0 28px;
+}
+.auth-welcome-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 14px;
+}
+.auth-welcome-icon svg {
+  width: 72px;
+  height: 72px;
+}
+.auth-welcome-text {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.auth-welcome-sub {
+  font-size: 13px;
+  color: #737373;
+}
+.btn-auth-primary {
+  width: 100%;
+  background: linear-gradient(135deg, #1d9bf0, #8b5cf6);
+  border: none;
+  color: #fff;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+.btn-auth-primary:hover { opacity: 0.9; }
+.btn-auth-secondary {
+  width: 100%;
+  background: none;
+  border: 1px solid #333;
+  color: #a3a3a3;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-auth-secondary:hover { border-color: #1d9bf0; color: #1d9bf0; }
+
+/* === User Menu === */
+.user-menu {
+  position: relative;
+  margin-left: auto;
+}
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.user-dropdown {
+  position: absolute;
+  top: 36px;
+  right: 0;
+  width: 200px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 10px;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+.user-info {
+  padding: 6px 4px 10px;
+  border-bottom: 1px solid #262626;
+  margin-bottom: 6px;
+}
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+.user-email {
+  font-size: 11px;
+  color: #737373;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.btn-logout {
+  width: 100%;
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 4px;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 6px;
+}
+.btn-logout:hover { background: #ef444415; }
 
 /* Status Card */
 .status-card {

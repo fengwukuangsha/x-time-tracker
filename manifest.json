@@ -1,10 +1,15 @@
 {
   "manifest_version": 3,
   "name": "X.com Time Tracker",
-  "version": "1.0",
+  "version": "1.1.0",
   "description": "访问 x.com 自动计时，超过10分钟提醒你休息",
-  "permissions": ["storage", "tabs", "alarms", "notifications"],
-  "host_permissions": ["*://x.com/*", "*://twitter.com/*"],
+  "permissions": ["storage", "tabs", "alarms", "notifications", "scripting"],
+  "host_permissions": [
+    "*://x.com/*",
+    "*://twitter.com/*",
+    "https://*.clerk.accounts.dev/*",
+    "https://*.clerk.com/*"
+  ],
   "background": {
     "service_worker": "background.js"
   },
@@ -15,6 +20,10 @@
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
     }
+  },
+  "options_ui": {
+    "page": "auth.html",
+    "open_in_tab": true
   },
   "icons": {
     "16": "icons/icon16.png",
